@@ -1,0 +1,145 @@
+﻿@model IEnumerable<PINGenerator.Models.PINModel>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml"; 
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Index</title>
+</head>
+<body>
+  <div class="col-md-12" id="pinGeneratordiv" style="padding-top: 15px;">  
+    <div class="panel panel-primary">  
+        <div class="panel-heading">  
+            <h3 class="panel-title">Generate and Emit PIN(s)</h3>  
+        </div>  
+        <div class="panel-body">  
+            <div class="form-group col-md-5">  
+                <label>Number of Pins required (from 1 to 5) *</label>  
+                <input type="text" name="txtpinCount" id="txtpinCount" class="form-control" placeholder="Enter PIN Count" required="required" />  
+            </div>  
+  
+            <div class="form-group col-md-1">  
+                <div style="display:inline-block;">  
+                    <input class="btn btn-primary" name="generateButton" id="btnGenerate" value="Generate" type="button">  
+                </div>  
+            </div>  
+                    
+            <div class="form-group col-md-1">  
+                <div style="display:inline-block;">  
+                    <input class="btn btn-primary" name="emitButton" id="btnEmit" value="Emit PIN(s)" type="button">  
+            </div>  
+          
+        </div>  
+        <div class="panel-body" id="errors" style="display:none;">
+        </div>
+     </div>  
+    </div><hr />  
+    <table id="tblPIN" class="table table-bordered table-striped table-responsive table-hover" style="display: none;">  
+        <thead>  
+            <tr>  
+                <th align="left" class="productth">PIN</th>  
+            </tr>  
+        </thead>  
+        <tbody></tbody>  
+    </table>  
+</div>  
+</body>
+</html>
+
+@section Scripts  
+{  
+    <script type="text/javascript">  
+    $(document).ready(function () {
+    $("#tblPIN").hide();
+    $("#errors").fadeOut();
+    $("#errors").html("");
+    //$("#displayMsg").hide();
+    $("#btnGenerate").click(function () {  
+            GeneratePin();
+             });
+     $("#btnEmit").click(function () {  
+            EmitPin();
+        });  
+    
+    function GeneratePin()
+    {
+        $("#tblPIN").hide();
+        var pin = $("#txtpinCount").val();  
+        if(pin == '' || pin == null || pin == 0)
+        { 
+           var msg = "please enter value greater than 0";
+           printMessage(msg);
+        }
+        else if(pin > 5)
+        {
+            var msg = "please enter value between 1 and 5";
+            printMessage(msg);
+        }
+        else
+        {
+            $.ajax({  
+                    type: "GET",  
+                    url: '@Url.Action("GeneratePin")',  
+                    data: {number :  pin},  
+                    contentType: "application/json; charset=utf-8",  
+                    success: function (data) {  
+                            var msg = "PINs generated successfully! Click on ''Generate' to generate more pins or click on Emit to emit the PINs generated";
+                            printMessage(msg);
+                            $("#txtpinCount").val(''); 
+                        },  
+                    error: function () {  
+                           $("#txtpinCount").val('');
+                           var msg = "Error while generating pins";
+                           printMessage(msg);
+                        }  
+                     });
+          }
+          return false;  
+     } 
+    
+    function EmitPin()
+    {
+        $("#tblPIN").show();
+        $.ajax({  
+                type: "GET",  
+                url: '@Url.Action("EmitPin")',  
+                contentType: "application/json; charset=utf-8",  
+                dataType: "json",
+                success: function (data) {  
+                     if(!!data && data != null) {
+                        var items = '';  
+                        $("#errors").fadeOut();
+                        $("#errors").html("");
+                        $("#tblPIN tbody tr").remove(); 
+                        $.each(data, function (i, item) {  
+                            var rows = "<tr>"  
+                            + "<td class='prtoducttd'>" + item.pinInNum + "</td>"  
+                            + "</tr>";  
+                            $('#tblPIN tbody').append(rows);  
+                        });  
+                    }
+                    else
+                    {
+                         var msg = "No pins generated till now! please generate pins to emit";
+                         printMessage(msg);
+                    }
+                },  
+                error: function () {  
+                        var msg = "Error while retrieving pins! please try again";
+                        printMessage(msg);
+                }  
+            });  
+            return false; 
+    }
+    
+    function printMessage(msg)
+    {
+        $("#errors").html("");
+        $("#errors").append('<div class="row msg_container base_receive"><div class="col-md-12 col-xs-12"><div class="messages msg_receive"><p><a>' + msg + '</a></p></div></div></div>');
+        $("#errors").fadeIn();
+    }
+    });
+   </script>  
+}  

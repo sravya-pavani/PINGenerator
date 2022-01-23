@@ -1,0 +1,26 @@
+﻿<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+    <meta charset="utf-8" />  
+    <title>@ViewBag.Title PIN Generator</title>  
+    <img src="https://www.lr.org/4a2381/globalassets/_shared-images/lr_logo.svg" width="10%" style="padding: 10px;"> 
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <meta name="viewport" content="width=device-width"/>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+</head>  
+<body>  
+    <div id="body" style="padding-top= 10px;">  
+        @RenderSection("Scripts", required: false)  
+        <section class="content-wrapper main-content clear-fix">  
+                @RenderBody()  
+            </section>  
+    </div>  
+    <footer>  
+            <div class="content-wrapper">  
+                <div class="float-left">  
+                    <p>© @DateTime.Now.Year – PIN Generator</p>  
+                </div>  
+            </div>  
+        </footer>  
+</body>  
+</html>  
